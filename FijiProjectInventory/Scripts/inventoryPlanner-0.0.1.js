@@ -22,21 +22,6 @@
         return ko.utils.arrayMap(array, callback);
     };
 
-    var arrayGetDistinctObservableValues = function (array) {
-        array = array || [];
-        var arrayVals= mapArray(array, function (el) { return { obs:el, val:el()} }),
-            resultVals = [], i = 0, j = array.length,
-            predicate = function (el) {
-                return (el.val === arrayVals[i].val);
-        };
-        for (; i < j; i++) {
-            if (ko.utils.arrayFirst(resultVals, predicate) === null) {
-                resultVals.push(arrayVals[i]);
-            }
-        }
-        return mapArray(resultVals, function (el) { return el.obs;});
-    };
-
     var purchaseObservedProps = [],
         dateFormat = "d M yy";
     ko.validation.init({
@@ -73,6 +58,12 @@
                 }
             }
         }
+
+        self.dispose = function () {
+            while (subscriptions.length) {
+                subscriptions.pop().dispose();
+            }
+        };
         //observables
         self.errors = ko.validation.group(self);
 
@@ -135,7 +126,26 @@
                     options.url = url;
                 }
                 return $.ajax(options);
-            };
+            }, itemNameChange = function () {
+                var i = 0,
+                    purchases = self.purchaseItems(), l = purchases.length, itemName;
+                self.itemNameOptions = [];
+                for (; i < l; i++) {
+                    itemName = purchases[i].ItemName();
+                    if ((itemName || itemName===0) && ko.utils.arrayIndexOf(self.itemNameOptions, itemName) === -1) {
+                        self.itemNameOptions.push(itemName);
+                    }
+                }
+            }, itemNameSubscriptions=[],
+            clearPurchaseItems = function () {
+                while (itemNameSubscriptions.length) {
+                    itemNameSubscriptions.pop().dispose();
+                };
+                ko.utils.arrayForEach(self.purchaseItems, function (el) {
+                    el.dispose();
+                });
+                self.purchaseItems.removeAll();
+             };
 
         // Editable data
         self.purchaseItems = ko.observableArray([]);
@@ -207,7 +217,7 @@
             return !self.errors().length;
         });
 
-        self.itemNameOptions = ko.observableArray([]);
+        self.itemNameOptions = [];
 
         var updateList = function () {
             if (!self.okToCreate()) { return; }
@@ -215,12 +225,13 @@
                 .done(function (data, textStatus, jqXHR) {
                     var items = mapArray(data, function (el) {
                         return new PlannedPurchase(self.totalCost, el);
-                    }),
-                        itemNames = mapArray(items, function (el) { return el.ItemName;}),
-                        distinctItemNames = arrayGetDistinctObservableValues(itemNames);
-                    self.purchaseItems.removeAll();
+                    });
+                    clearPurchaseItems();
                     self.purchaseItems.push.apply(self.purchaseItems, items);
-                    self.itemNameOptions.push.apply(self.itemNameOptions, distinctItemNames);
+                    ko.utils.arrayForEach(items, function (el) {
+                        itemNameSubscriptions.push(el.ItemName.subscribe(itemNameChange));
+                    });
+                    itemNameChange();
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     alert("Update failed with: " + errorThrown);
                 });
@@ -234,7 +245,7 @@
             var newItem = new PlannedPurchase(self.totalCost);
             self.purchaseItems.unshift(newItem);
             newItem.errors.showAllMessages();
-            self.itemNameOptions.push(newItem.ItemName);
+            itemNameSubscriptions.push(newItem.ItemName.subscribe(itemNameChange))
         };
         self.removeItem = function (item)
         {

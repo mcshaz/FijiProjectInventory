@@ -110,7 +110,7 @@ namespace FijiProjectInventory.ServiceLayer
                     {
                         s = db.Subcategories.Find(d.SubcategoryId);
                     }
-                    s.Description = d.SubcategoryDescription;
+                    s.Description = d.SubcategoryDescription ?? string.Empty;
                     s.ItemId = d.ItemId;
                     s.Item = i;
 

@@ -1,4 +1,5 @@
-﻿https://github.com/rniemeyer/knockout-jqAutocomplete
+﻿//https://github.com/rniemeyer/knockout-jqAutocomplete
+//version 0.4.3
 ; (function (factory) {
     if (typeof define === "function" && define.amd) {
         // AMD anonymous module
