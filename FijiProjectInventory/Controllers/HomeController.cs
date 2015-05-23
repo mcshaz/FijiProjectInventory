@@ -18,18 +18,26 @@ namespace FijiProjectInventory.Controllers
         [HttpPost, ValidateAntiForgeryToken] //ValidateInput, Authorize
         public ActionResult Index(List<RequiredItem> data, byte categoryId)
         {
-            PurchaseItemsServices.AddOrUpdateItems(data, categoryId);
-            var returnVar = new JsonNetResult { CustomResolver = new DerivedTypeFilterContractResolver<RequiredItemIds>() };
-            returnVar.Data = data;
-            return returnVar;
+            if (ModelState.IsValid)
+            {
+                PurchaseItemsServices.AddOrUpdateItems(data, categoryId);
+                var returnVar = new JsonNetResult { CustomResolver = new DerivedTypeFilterContractResolver<RequiredItemIds>() };
+                returnVar.Data = data;
+                return returnVar;
+            }
+            return ModelState.JsonValidation();
         }
         [HttpPost, ValidateAntiForgeryToken]
         public ActionResult GetPurchases(int categoryId, DateTime projectDate)
         {
-            var model = PurchaseItemsServices.GetRequiredItems(categoryId, projectDate);
-            var returnVar = new JsonNetResult();
-            returnVar.Data = model;
-            return returnVar;
+            if (ModelState.IsValid)
+            {
+                var model = PurchaseItemsServices.GetRequiredItems(categoryId, projectDate);
+                var returnVar = new JsonNetResult();
+                returnVar.Data = model;
+                return returnVar;
+            }
+            return ModelState.JsonValidation();
         }
         public ActionResult About()
         {

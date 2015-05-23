@@ -8,9 +8,9 @@
 @Html.AntiForgeryToken()
 <h4>Total Cost: <span data-bind='currency: totalCost'></span></h4>
 <div>
-    <a href="#" data-bind="click:addItem">Create New</a>
+    <a href="#" data-bind="enableClick:okToCreate, click:addItem">Create New</a>
     <input type="button" id="submitBtn" data-bind="click:saveChanges, enable:okToSave" value="Save Changes" />
-    <select id="categories" data-bind="value: category, options: categoryOptions, optionsText: 'Value', optionsCaption: 'Select Category'" ></select>
+    <select id="categories" data-bind="value: category, options: categoryOptions, optionsText: 'Value', optionsCaption: 'Select Category', disable:anyForUpdate" ></select>
     <select id="dates" data-bind="value: selectedDate, options: dates, optionsText:'formatted',optionsCaption: 'Select Project Date'"></select>
     <div id="dpholder">
         <label for="dp" id="dplabel">project date:</label>
@@ -89,9 +89,9 @@
 </table>
 <script type="text/html" id="itemTemplate">
     <tr class="data-row">
-        <td class="rowErrorMarker" data-bind="style:{visibility: isValid?'visible':'hidden'}, attr:{title: errors().join('\n')}">*</td>
+        <td class="rowErrorMarker" data-bind="style:{visibility: isValid()?'hidden':'visible'}, attr:{title: errors().join('\n')}">*</td>
         <td>
-            @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "jqAuto: { value: ItemName, source: $root.myOptions}" } })
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "jqAuto: { value: ItemName, source: $root.itemNameOptions}" } })
         </td>
         <td class="bool">
             @Html.EditorFor(model => model.RequiredItemDefaults.ItemRequiresRefridge, new { htmlAttributes = new { data_bind = "checked:ItemRequiresRefridge" } })

@@ -138,4 +138,31 @@
             }
         }
     };
+
+    ko.bindingHandlers.enableClick = {
+            init: function(element, valueAccessor) {
+                $(element).click(function(evt) {
+                    if (!ko.unwrap(valueAccessor())) {
+                        evt.preventDefault();
+                        evt.stopImmediatePropagation();
+                    }
+                });
+                //begin of 'hack' to move our 'disable' event handler to to of the stack
+                var events = $._data(element, "events");
+                var handlers = events['click'];
+                if (handlers.length == 1) {
+                    return;
+                }
+                handlers.splice(0, 0, handlers.pop());
+                //end of 'hack' to move our 'disable' event handler to to of the stack
+            },
+            update: function(element, valueAccessor) {
+                var value = !ko.unwrap(valueAccessor());
+                ko.bindingHandlers.css.update(element, function() {
+                    return {
+                        disabled_anchor: value
+                    };
+                });
+            }
+        };
 })();

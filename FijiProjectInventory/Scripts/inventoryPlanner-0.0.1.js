@@ -14,7 +14,28 @@
             return ko.bindingHandlers['validationCore'].init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
         };
     };
-    makeBindingHandlerValidatable('jqAuto','value');
+    makeBindingHandlerValidatable('jqAuto', 'value');
+
+    //callback function with args value, index, array
+    var mapArray = function (array, callback) {
+        if (Array.prototype.map) { return Array.prototype.map.call(array, callback); }
+        return ko.utils.arrayMap(array, callback);
+    };
+
+    var arrayGetDistinctObservableValues = function (array) {
+        array = array || [];
+        var arrayVals= mapArray(array, function (el) { return { obs:el, val:el()} }),
+            resultVals = [], i = 0, j = array.length,
+            predicate = function (el) {
+                return (el.val === arrayVals[i].val);
+        };
+        for (; i < j; i++) {
+            if (ko.utils.arrayFirst(resultVals, predicate) === null) {
+                resultVals.push(arrayVals[i]);
+            }
+        }
+        return mapArray(resultVals, function (el) { return el.obs;});
+    };
 
     var purchaseObservedProps = [],
         dateFormat = "d M yy";
@@ -97,6 +118,11 @@
     // Overall viewmodel for this screen, along with initial state
     function PurchasesViewModel() {
         var self = this, sortAsc = {},
+            unloadfunc = function(){
+                confirmationMessage = 'If you leave before saving, your changes will be lost.';
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            },
             //data must be an object including the name of the arguments on the MVC method
             sendAjax = function (data, url) {
                 var options = {
@@ -141,10 +167,18 @@
             return false;
         });
 
+        self.anyForUpdate.subscribe(function (newVal) {
+            if (newVal) {
+                $(window).on('beforeunload', unloadfunc);
+            } else {
+                $(window).off('beforeunload', unloadfunc);
+            }
+        });
+
         self.categoryOptions = koMvcGlobals.enumerables.categories;
         self.category = ko.observable().extend({ required: true });
 
-        var dates = ko.utils.arrayMap(koMvcGlobals.enumerables.dates, function (el) {
+        var dates = mapArray(koMvcGlobals.enumerables.dates, function (el) {
             var dt = new Date(el);
             return { date:dt, formatted:$.datepicker.formatDate(dateFormat,dt)};
         }),
@@ -157,26 +191,36 @@
         dates.reverse();
         if (!startDate) { startDate = dates[0]; }
         self.dates = ko.observableArray(dates);
-        self.selectedDate = ko.observable(startDate);
+        self.selectedDate = ko.observable(startDate).extend({required:true});
 
         self.errors = ko.validation.group(self);
+        self.IsValid = ko.computed(function () {
+            self.allValid() && (self.errors().length === 0);
+        });
         self.errors.showAllMessages();
 
         self.okToSave = ko.computed(function () {
-            return self.allValid() && self.anyForUpdate() && self.category.isValid();
+            return self.category.isValid() && self.anyForUpdate();
         });
 
-        self.myOptions = ["a", "b", "c"];
+        self.okToCreate = ko.computed(function () {
+            return !self.errors().length;
+        });
+
+        self.itemNameOptions = ko.observableArray([]);
 
         var updateList = function () {
-            if (!(self.selectedDate.isValid() && self.category.isValid())) { return; }
+            if (!self.okToCreate()) { return; }
             sendAjax({ categoryId: self.category().Key, projectDate:self.selectedDate().date.toISOString() }, koMvcGlobals.urls.getPurchases)
                 .done(function (data, textStatus, jqXHR) {
-                    var items = ko.utils.arrayMap(data, function (el) {
+                    var items = mapArray(data, function (el) {
                         return new PlannedPurchase(self.totalCost, el);
-                    });
+                    }),
+                        itemNames = mapArray(items, function (el) { return el.ItemName;}),
+                        distinctItemNames = arrayGetDistinctObservableValues(itemNames);
                     self.purchaseItems.removeAll();
-                    self.purchaseItems.push.apply(self.purchaseItems,items);
+                    self.purchaseItems.push.apply(self.purchaseItems, items);
+                    self.itemNameOptions.push.apply(self.itemNameOptions, distinctItemNames);
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     alert("Update failed with: " + errorThrown);
                 });
@@ -190,6 +234,7 @@
             var newItem = new PlannedPurchase(self.totalCost);
             self.purchaseItems.unshift(newItem);
             newItem.errors.showAllMessages();
+            self.itemNameOptions.push(newItem.ItemName);
         };
         self.removeItem = function (item)
         {
@@ -218,11 +263,12 @@
 
             //now sorted, set isRepeatItem
             ko.utils.arrayForEach(self.purchaseItems(), function (purchaseItem) {
-                if (purchaseItem.itemName===lastHeaderName) {
+                var name = purchaseItem.ItemName();
+                if (name===lastHeaderName) {
                     purchaseItem.IsRepeatItem(true);
                 } else {
                     purchaseItem.IsRepeatItem(false);
-                    lastHeaderName = purchaseItem.itemName;
+                    lastHeaderName = name;
                 }
             });
         };

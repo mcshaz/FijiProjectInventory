@@ -12,10 +12,6 @@ using Newtonsoft.Json;
 
 namespace FijiProjectInventory.Helpers
 {
-    internal class KoJSObjects
-    {
-        public IDictionary<string, IDictionary<string, string>> Observables { get; set; }
-    }
     public class TwoWayMapping
     {
         public IHtmlString KoMappedObject { get; internal set; }
