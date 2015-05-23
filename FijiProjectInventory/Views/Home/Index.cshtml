@@ -1,0 +1,150 @@
+﻿@model FijiProjectInventory.Models.RequiredItemsModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Required Items</h2>
+@Html.AntiForgeryToken()
+<h4>Total Cost: <span data-bind='currency: totalCost'></span></h4>
+<div>
+    <a href="#" data-bind="click:addItem">Create New</a>
+    <input type="button" id="submitBtn" data-bind="click:saveChanges, enable:okToSave" value="Save Changes" />
+    <select id="categories" data-bind="value: category, options: categoryOptions, optionsText: 'Value', optionsCaption: 'Select Category'" ></select>
+    <select id="dates" data-bind="value: selectedDate, options: dates, optionsText:'formatted',optionsCaption: 'Select Project Date'"></select>
+    <div id="dpholder">
+        <label for="dp" id="dplabel">project date:</label>
+        <input id="dp" data-bind="datepicker: addProjectDate, datepickerOptions: { minDate: new Date() , dateFormat:'d M yy', showButtonPanel:true }" />
+    </div>
+</div>
+<table id="purchaseTable">
+    <thead>
+        <tr class="head-centre">
+            <td></td>
+            <th rowspan="2" >
+                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemName)')">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemName)
+                </a>
+            </th>
+            <th rowspan="2" class="unpadded">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemRequiresRefridge)
+            </th>
+            <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.SubcategoryDescription)
+            </th>
+            <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.SupplierName)
+            </th>
+            <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.PricePerBox)
+            </th>
+            <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPerBox)
+            </th>
+            <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.Boxes)
+            </th>
+
+            <th rowspan="2"  >
+                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.RemainingItems)')">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.RemainingItems)
+                </a>
+            </th>
+            <th rowspan="2"  >
+                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.PerItemCost)')">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.PerItemCost)
+                </a>
+            </th>
+            <th rowspan="2"  >
+                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemsPurchased)')">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPurchased)
+                </a>
+            </th>
+            <th rowspan="2"  >
+                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.Cost)')">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.Cost)
+                </a>
+            </th>
+            @if (Model.PastYears.Count > 0)
+            {
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.RemainingItems)
+                </th>
+                <th colspan="@Model.PastYears.Count">Used in Year</th>
+            }
+        </tr>
+        @if (Model.PastYears.Count > 0)
+        {
+        <tr>
+            <td colspan="10"></td>
+            @foreach (var i in Model.PastYears)
+            {
+                <td>i</td>
+            }
+        </tr>
+        }
+
+    </thead>
+    <tbody data-bind="template: { name: 'itemTemplate', foreach: purchaseItems }"></tbody>
+</table>
+<script type="text/html" id="itemTemplate">
+    <tr class="data-row">
+        <td class="rowErrorMarker" data-bind="style:{visibility: isValid?'visible':'hidden'}, attr:{title: errors().join('\n')}">*</td>
+        <td>
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "jqAuto: { value: ItemName, source: $root.myOptions}" } })
+        </td>
+        <td class="bool">
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemRequiresRefridge, new { htmlAttributes = new { data_bind = "checked:ItemRequiresRefridge" } })
+        </td>
+        <td>
+            @Html.EditorFor(model => model.RequiredItemDefaults.SubcategoryDescription, new { htmlAttributes = new { data_bind = "value:SubcategoryDescription" } })
+        </td>
+        <td>
+            @Html.EditorFor(model => model.RequiredItemDefaults.SupplierName, new { htmlAttributes = new { data_bind = "value:SupplierName" } })
+        </td>
+        <td>
+            $@Html.EditorFor(model => model.RequiredItemDefaults.PricePerBox, new { htmlAttributes = new { data_bind = "currency:PricePerBox, symbol:''", @class = "cost" } })
+        </td>
+        <td>
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemsPerBox, new { htmlAttributes = new { data_bind = "textInput:ItemsPerBox", @class = "count" } })
+        </td>
+        <td>
+            @Html.EditorFor(model => model.RequiredItemDefaults.Boxes, new { htmlAttributes = new { data_bind = "textInput:Boxes", @class = "count" } })
+        </td>
+        <td data-bind="text:RemainingItems" class="calculatedVal">
+        </td>
+        <td class="calculatedVal">
+            <span data-bind="currency:SingleItemCost" />
+        </td>
+        <td data-bind = "text:ItemsPurchased"  class="calculatedVal">
+        </td>
+        <td data-bind="attr: {title:ItemTotalPercent}" class="calculatedVal">
+            <span data-bind="currency:ItemsCost"/>
+        </td>
+        <td data-bind="foreach:UsedInYear" class="calculatedVal">
+        </td>
+    </tr>
+</script>
+
+<script type="text/javascript">
+    @{ var mappers = Html.ValidationToJs(Model.RequiredItemDefaults); }
+    ; 
+    window.koMvcGlobals = {
+            urls:{
+                getPurchases : '@Url.Action("GetPurchases")',
+                addProjectDate : '@Url.Action("AddDate")'
+            },
+        enumerables:{
+                suppliers : @Html.AsJson(Model.Suppliers),
+                categories : @Html.AsJson(Model.Categories),
+                dates: @Html.AsJson(Model.ProjectDates)
+            },
+        mappers:{
+            mappedObject : @mappers.KoMappedObject,
+            unmappedObject : @mappers.KoUnmappedObject
+        }
+    };
+</script>
+
+@Scripts.Render("~/bundles/knockout")
+@Scripts.Render("~/Scripts/inventoryPlanner-0.0.1.js")

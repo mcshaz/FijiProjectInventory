@@ -1,0 +1,667 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="InventoryDb.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Categories">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Items">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="RequiresRefrig" Type="bit" Nullable="false" />
+          <Property Name="Notes" Type="varchar" MaxLength="1000" />
+          <Property Name="CategoryId" Type="tinyint" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Locations">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ProjectDates">
+          <Key>
+            <PropertyRef Name="StartDate" />
+          </Key>
+          <Property Name="StartDate" Type="date" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Purchases">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SubcategoryId" Type="int" Nullable="false" />
+          <Property Name="PricePerBox" Type="smallmoney" Nullable="false" />
+          <Property Name="SupplierId" Type="tinyint" />
+          <Property Name="ItemsPerBox" Type="tinyint" Nullable="false" />
+          <Property Name="Boxes" Type="smallint" Nullable="false" />
+          <Property Name="DatePurchased" Type="date" />
+          <Property Name="ExpiryDate" Type="date" />
+        </EntityType>
+        <EntityType Name="StoreMovements">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PurchaseId" Type="int" Nullable="false" />
+          <Property Name="WardId" Type="tinyint" Nullable="false" />
+          <Property Name="ItemsOut" Type="smallint" Nullable="false" />
+          <Property Name="ItemsReturned" Type="smallint" Nullable="false" />
+          <Property Name="TimeOut" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="TimeReturned" Type="datetime2" Precision="7" />
+          <Property Name="Notes" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="CheckoutUserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="CheckinUserId" Type="nvarchar" MaxLength="128" />
+        </EntityType>
+        <EntityType Name="StoreReturnDisparities">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" Nullable="false" />
+          <Property Name="StoreMovementId" Type="int" Nullable="false" />
+          <Property Name="ItemsReturned" Type="smallint" Nullable="false" />
+          <Property Name="CheckinUserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Subcategories">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ItemId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Suppliers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserReviews">
+          <Key>
+            <PropertyRef Name="ReviewId" />
+          </Key>
+          <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="DateReviewed" Type="datetime2" Precision="7" Nullable="false" />
+          <Property Name="UpdatedValues" Type="bit" Nullable="false" />
+          <Property Name="ReviewId" Type="int" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'Inventory.dbo.UseByYearVw' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="UseByYearVw">
+          <Key>
+            <PropertyRef Name="PurchaseId" />
+          </Key>
+          <Property Name="PurchaseId" Type="int" Nullable="false" />
+          <Property Name="YearUsed" Type="int" />
+          <Property Name="TotalUsed" Type="int" />
+        </EntityType>
+        <Association Name="FK_Checkout_DrugLocations">
+          <End Role="Locations" Type="Self.Locations" Multiplicity="1" />
+          <End Role="StoreMovements" Type="Self.StoreMovements" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Locations">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreMovements">
+              <PropertyRef Name="WardId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DrugConcentrations_Drugs">
+          <End Role="Items" Type="Self.Items" Multiplicity="1" />
+          <End Role="Subcategories" Type="Self.Subcategories" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Items">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Subcategories">
+              <PropertyRef Name="ItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Items_Categories">
+          <End Role="Categories" Type="Self.Categories" Multiplicity="1" />
+          <End Role="Items" Type="Self.Items" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Categories">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Items">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Quotes_DrugConcentrations">
+          <End Role="Subcategories" Type="Self.Subcategories" Multiplicity="1" />
+          <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Subcategories">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Purchases">
+              <PropertyRef Name="SubcategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Quotes_Suppliers">
+          <End Role="Suppliers" Type="Self.Suppliers" Multiplicity="0..1" />
+          <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Suppliers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Purchases">
+              <PropertyRef Name="SupplierId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StoreMovements_Purchase">
+          <End Role="Purchases" Type="Self.Purchases" Multiplicity="1" />
+          <End Role="StoreMovements" Type="Self.StoreMovements" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Purchases">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreMovements">
+              <PropertyRef Name="PurchaseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StoreReturnDisparity_StoreMovements">
+          <End Role="StoreMovements" Type="Self.StoreMovements" Multiplicity="1" />
+          <End Role="StoreReturnDisparities" Type="Self.StoreReturnDisparities" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreMovements">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreReturnDisparities">
+              <PropertyRef Name="StoreMovementId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="sp_purchased_items_indate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="projectdate" Type="date" Mode="In" />
+        </Function>
+        <EntityContainer Name="InventoryDbStoreContainer">
+          <EntitySet Name="Categories" EntityType="Self.Categories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Items" EntityType="Self.Items" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Locations" EntityType="Self.Locations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProjectDates" EntityType="Self.ProjectDates" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Purchases" EntityType="Self.Purchases" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StoreMovements" EntityType="Self.StoreMovements" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="StoreReturnDisparities" EntityType="Self.StoreReturnDisparities" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Subcategories" EntityType="Self.Subcategories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Suppliers" EntityType="Self.Suppliers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserReviews" EntityType="Self.UserReviews" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UseByYearVw" EntityType="Self.UseByYearVw" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [UseByYearVw].[PurchaseId] AS [PurchaseId], 
+    [UseByYearVw].[YearUsed] AS [YearUsed], 
+    [UseByYearVw].[TotalUsed] AS [TotalUsed]
+    FROM [dbo].[UseByYearVw] AS [UseByYearVw]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Checkout_DrugLocations" Association="Self.FK_Checkout_DrugLocations">
+            <End Role="Locations" EntitySet="Locations" />
+            <End Role="StoreMovements" EntitySet="StoreMovements" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DrugConcentrations_Drugs" Association="Self.FK_DrugConcentrations_Drugs">
+            <End Role="Items" EntitySet="Items" />
+            <End Role="Subcategories" EntitySet="Subcategories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Items_Categories" Association="Self.FK_Items_Categories">
+            <End Role="Categories" EntitySet="Categories" />
+            <End Role="Items" EntitySet="Items" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Quotes_DrugConcentrations" Association="Self.FK_Quotes_DrugConcentrations">
+            <End Role="Subcategories" EntitySet="Subcategories" />
+            <End Role="Purchases" EntitySet="Purchases" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Quotes_Suppliers" Association="Self.FK_Quotes_Suppliers">
+            <End Role="Suppliers" EntitySet="Suppliers" />
+            <End Role="Purchases" EntitySet="Purchases" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StoreMovements_Purchase" Association="Self.FK_StoreMovements_Purchase">
+            <End Role="Purchases" EntitySet="Purchases" />
+            <End Role="StoreMovements" EntitySet="StoreMovements" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StoreReturnDisparity_StoreMovements" Association="Self.FK_StoreReturnDisparity_StoreMovements">
+            <End Role="StoreMovements" EntitySet="StoreMovements" />
+            <End Role="StoreReturnDisparities" EntitySet="StoreReturnDisparities" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="InventoryDb" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="InventoryEntitiesConnect" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Categories" EntityType="InventoryDb.Category" />
+          <EntitySet Name="Items" EntityType="InventoryDb.Item" />
+          <EntitySet Name="Locations" EntityType="InventoryDb.Location" />
+          <EntitySet Name="Purchases" EntityType="InventoryDb.Purchase" />
+          <EntitySet Name="StoreMovements" EntityType="InventoryDb.StoreMovement" />
+          <EntitySet Name="StoreReturnDisparities" EntityType="InventoryDb.StoreReturnDisparity" />
+          <EntitySet Name="Subcategories" EntityType="InventoryDb.Subcategory" />
+          <EntitySet Name="Suppliers" EntityType="InventoryDb.Supplier" />
+          <EntitySet Name="UseByYearVws" EntityType="InventoryDb.UseByYearVw" />
+          <AssociationSet Name="FK_Items_Categories" Association="InventoryDb.FK_Items_Categories">
+            <End Role="Category" EntitySet="Categories" />
+            <End Role="Item" EntitySet="Items" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DrugConcentrations_Drugs" Association="InventoryDb.FK_DrugConcentrations_Drugs">
+            <End Role="Item" EntitySet="Items" />
+            <End Role="Subcategory" EntitySet="Subcategories" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Checkout_DrugLocations" Association="InventoryDb.FK_Checkout_DrugLocations">
+            <End Role="Location" EntitySet="Locations" />
+            <End Role="StoreMovement" EntitySet="StoreMovements" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Quotes_DrugConcentrations" Association="InventoryDb.FK_Quotes_DrugConcentrations">
+            <End Role="Subcategory" EntitySet="Subcategories" />
+            <End Role="Purchase" EntitySet="Purchases" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Quotes_Suppliers" Association="InventoryDb.FK_Quotes_Suppliers">
+            <End Role="Supplier" EntitySet="Suppliers" />
+            <End Role="Purchase" EntitySet="Purchases" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StoreMovements_Purchase" Association="InventoryDb.FK_StoreMovements_Purchase">
+            <End Role="Purchase" EntitySet="Purchases" />
+            <End Role="StoreMovement" EntitySet="StoreMovements" />
+          </AssociationSet>
+          <AssociationSet Name="FK_StoreReturnDisparity_StoreMovements" Association="InventoryDb.FK_StoreReturnDisparity_StoreMovements">
+            <End Role="StoreMovement" EntitySet="StoreMovements" />
+            <End Role="StoreReturnDisparity" EntitySet="StoreReturnDisparities" />
+          </AssociationSet>
+          <FunctionImport Name="sp_purchased_items_indate" ReturnType="Collection(InventoryDb.sp_purchased_items_indate_Result)">
+          <Parameter Name="projectdate" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <EntitySet Name="ProjectDates" EntityType="InventoryDb.ProjectDate" />
+          <EntitySet Name="UserReviews" EntityType="InventoryDb.UserReview" />
+        </EntityContainer>
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Items" Relationship="InventoryDb.FK_Items_Categories" FromRole="Category" ToRole="Item" />
+        </EntityType>
+        <EntityType Name="Item">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RequiresRefrig" Type="Boolean" Nullable="false" />
+          <Property Name="Notes" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="CategoryId" Type="Byte" Nullable="false" />
+          <NavigationProperty Name="Category" Relationship="InventoryDb.FK_Items_Categories" FromRole="Item" ToRole="Category" />
+          <NavigationProperty Name="Subcategories" Relationship="InventoryDb.FK_DrugConcentrations_Drugs" FromRole="Item" ToRole="Subcategory" />
+        </EntityType>
+        <EntityType Name="Location">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="StoreMovements" Relationship="InventoryDb.FK_Checkout_DrugLocations" FromRole="Location" ToRole="StoreMovement" />
+        </EntityType>
+        <EntityType Name="Purchase">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SubcategoryId" Type="Int32" Nullable="false" />
+          <Property Name="PricePerBox" Type="Decimal" Nullable="false" Precision="10" Scale="4" />
+          <Property Name="SupplierId" Type="Byte" />
+          <Property Name="ItemsPerBox" Type="Byte" Nullable="false" />
+          <Property Name="Boxes" Type="Int16" Nullable="false" />
+          <Property Name="DatePurchased" Type="DateTime" Precision="0" />
+          <Property Name="ExpiryDate" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="Subcategory" Relationship="InventoryDb.FK_Quotes_DrugConcentrations" FromRole="Purchase" ToRole="Subcategory" />
+          <NavigationProperty Name="Supplier" Relationship="InventoryDb.FK_Quotes_Suppliers" FromRole="Purchase" ToRole="Supplier" />
+          <NavigationProperty Name="StoreMovements" Relationship="InventoryDb.FK_StoreMovements_Purchase" FromRole="Purchase" ToRole="StoreMovement" />
+        </EntityType>
+        <EntityType Name="StoreMovement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PurchaseId" Type="Int32" Nullable="false" />
+          <Property Name="WardId" Type="Byte" Nullable="false" />
+          <Property Name="ItemsOut" Type="Int16" Nullable="false" />
+          <Property Name="ItemsReturned" Type="Int16" Nullable="false" />
+          <Property Name="TimeOut" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="TimeReturned" Type="DateTime" Precision="7" />
+          <Property Name="Notes" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CheckoutUserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CheckinUserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Location" Relationship="InventoryDb.FK_Checkout_DrugLocations" FromRole="StoreMovement" ToRole="Location" />
+          <NavigationProperty Name="Purchase" Relationship="InventoryDb.FK_StoreMovements_Purchase" FromRole="StoreMovement" ToRole="Purchase" />
+          <NavigationProperty Name="StoreReturnDisparities" Relationship="InventoryDb.FK_StoreReturnDisparity_StoreMovements" FromRole="StoreMovement" ToRole="StoreReturnDisparity" />
+        </EntityType>
+        <EntityType Name="StoreReturnDisparity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="StoreMovementId" Type="Int32" Nullable="false" />
+          <Property Name="ItemsReturned" Type="Int16" Nullable="false" />
+          <Property Name="CheckinUserId" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="StoreMovement" Relationship="InventoryDb.FK_StoreReturnDisparity_StoreMovements" FromRole="StoreReturnDisparity" ToRole="StoreMovement" />
+        </EntityType>
+        <EntityType Name="Subcategory">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ItemId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Item" Relationship="InventoryDb.FK_DrugConcentrations_Drugs" FromRole="Subcategory" ToRole="Item" />
+          <NavigationProperty Name="Purchases" Relationship="InventoryDb.FK_Quotes_DrugConcentrations" FromRole="Subcategory" ToRole="Purchase" />
+        </EntityType>
+        <EntityType Name="Supplier">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Purchases" Relationship="InventoryDb.FK_Quotes_Suppliers" FromRole="Supplier" ToRole="Purchase" />
+        </EntityType>
+        <EntityType Name="UseByYearVw">
+          <Key>
+            <PropertyRef Name="PurchaseId" />
+          </Key>
+          <Property Name="PurchaseId" Type="Int32" Nullable="false" />
+          <Property Name="YearUsed" Type="Int32" Nullable="false" />
+          <Property Name="TotalUsed" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Items_Categories">
+          <End Type="InventoryDb.Category" Role="Category" Multiplicity="1" />
+          <End Type="InventoryDb.Item" Role="Item" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Item">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DrugConcentrations_Drugs">
+          <End Type="InventoryDb.Item" Role="Item" Multiplicity="1" />
+          <End Type="InventoryDb.Subcategory" Role="Subcategory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Item">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Subcategory">
+              <PropertyRef Name="ItemId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Checkout_DrugLocations">
+          <End Type="InventoryDb.Location" Role="Location" Multiplicity="1" />
+          <End Type="InventoryDb.StoreMovement" Role="StoreMovement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Location">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreMovement">
+              <PropertyRef Name="WardId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Quotes_DrugConcentrations">
+          <End Type="InventoryDb.Subcategory" Role="Subcategory" Multiplicity="1" />
+          <End Type="InventoryDb.Purchase" Role="Purchase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Subcategory">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Purchase">
+              <PropertyRef Name="SubcategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Quotes_Suppliers">
+          <End Type="InventoryDb.Supplier" Role="Supplier" Multiplicity="0..1" />
+          <End Type="InventoryDb.Purchase" Role="Purchase" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Supplier">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Purchase">
+              <PropertyRef Name="SupplierId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StoreMovements_Purchase">
+          <End Type="InventoryDb.Purchase" Role="Purchase" Multiplicity="1" />
+          <End Type="InventoryDb.StoreMovement" Role="StoreMovement" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Purchase">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreMovement">
+              <PropertyRef Name="PurchaseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_StoreReturnDisparity_StoreMovements">
+          <End Type="InventoryDb.StoreMovement" Role="StoreMovement" Multiplicity="1" />
+          <End Type="InventoryDb.StoreReturnDisparity" Role="StoreReturnDisparity" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="StoreMovement">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="StoreReturnDisparity">
+              <PropertyRef Name="StoreMovementId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="sp_purchased_items_indate_Result">
+          <Property Type="Int32" Name="PurchaseId" Nullable="false" />
+          <Property Type="Int32" Name="ItemId" Nullable="false" />
+          <Property Type="Int32" Name="SubcatId" Nullable="false" />
+          <Property Type="Byte" Name="CategoryId" Nullable="false" />
+          <Property Type="String" Name="Name" Nullable="false" MaxLength="50" />
+          <Property Type="Boolean" Name="RequiresRefrig" Nullable="false" />
+          <Property Type="String" Name="Notes" Nullable="true" MaxLength="1000" />
+          <Property Type="String" Name="Description" Nullable="false" MaxLength="50" />
+          <Property Type="Decimal" Name="PricePerBox" Nullable="false" Precision="10" />
+          <Property Type="Byte" Name="ItemsPerBox" Nullable="false" />
+          <Property Type="Int16" Name="Boxes" Nullable="false" />
+          <Property Type="DateTime" Name="DatePurchased" Nullable="true" />
+          <Property Type="DateTime" Name="ExpiryDate" Nullable="true" />
+          <Property Type="Byte" Name="SupplierId" Nullable="true" />
+          <Property Type="Int32" Name="ItemsRemaining" Nullable="true" />
+          <Property Type="String" Name="SupplierName" Nullable="false" MaxLength="50" />
+        </ComplexType>
+        <EntityType Name="ProjectDate">
+          <Key>
+            <PropertyRef Name="StartDate" />
+          </Key>
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="0" />
+        </EntityType>
+        <EntityType Name="UserReview">
+          <Key>
+            <PropertyRef Name="ReviewId" />
+          </Key>
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="DateReviewed" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="UpdatedValues" Type="Boolean" Nullable="false" />
+          <Property Name="ReviewId" Type="Int32" Nullable="false" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="InventoryDbStoreContainer" CdmEntityContainer="InventoryEntitiesConnect">
+          <EntitySetMapping Name="Categories">
+            <EntityTypeMapping TypeName="InventoryDb.Category">
+              <MappingFragment StoreEntitySet="Categories">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Items">
+            <EntityTypeMapping TypeName="InventoryDb.Item">
+              <MappingFragment StoreEntitySet="Items">
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="RequiresRefrig" ColumnName="RequiresRefrig" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Locations">
+            <EntityTypeMapping TypeName="InventoryDb.Location">
+              <MappingFragment StoreEntitySet="Locations">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Purchases">
+            <EntityTypeMapping TypeName="InventoryDb.Purchase">
+              <MappingFragment StoreEntitySet="Purchases">
+                <ScalarProperty Name="ExpiryDate" ColumnName="ExpiryDate" />
+                <ScalarProperty Name="DatePurchased" ColumnName="DatePurchased" />
+                <ScalarProperty Name="Boxes" ColumnName="Boxes" />
+                <ScalarProperty Name="ItemsPerBox" ColumnName="ItemsPerBox" />
+                <ScalarProperty Name="SupplierId" ColumnName="SupplierId" />
+                <ScalarProperty Name="PricePerBox" ColumnName="PricePerBox" />
+                <ScalarProperty Name="SubcategoryId" ColumnName="SubcategoryId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StoreMovements">
+            <EntityTypeMapping TypeName="InventoryDb.StoreMovement">
+              <MappingFragment StoreEntitySet="StoreMovements">
+                <ScalarProperty Name="CheckinUserId" ColumnName="CheckinUserId" />
+                <ScalarProperty Name="CheckoutUserId" ColumnName="CheckoutUserId" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="TimeReturned" ColumnName="TimeReturned" />
+                <ScalarProperty Name="TimeOut" ColumnName="TimeOut" />
+                <ScalarProperty Name="ItemsReturned" ColumnName="ItemsReturned" />
+                <ScalarProperty Name="ItemsOut" ColumnName="ItemsOut" />
+                <ScalarProperty Name="WardId" ColumnName="WardId" />
+                <ScalarProperty Name="PurchaseId" ColumnName="PurchaseId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="StoreReturnDisparities">
+            <EntityTypeMapping TypeName="InventoryDb.StoreReturnDisparity">
+              <MappingFragment StoreEntitySet="StoreReturnDisparities">
+                <ScalarProperty Name="CheckinUserId" ColumnName="CheckinUserId" />
+                <ScalarProperty Name="ItemsReturned" ColumnName="ItemsReturned" />
+                <ScalarProperty Name="StoreMovementId" ColumnName="StoreMovementId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Subcategories">
+            <EntityTypeMapping TypeName="InventoryDb.Subcategory">
+              <MappingFragment StoreEntitySet="Subcategories">
+                <ScalarProperty Name="ItemId" ColumnName="ItemId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Suppliers">
+            <EntityTypeMapping TypeName="InventoryDb.Supplier">
+              <MappingFragment StoreEntitySet="Suppliers">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UseByYearVws">
+            <EntityTypeMapping TypeName="InventoryDb.UseByYearVw">
+              <MappingFragment StoreEntitySet="UseByYearVw">
+                <ScalarProperty Name="TotalUsed" ColumnName="TotalUsed" />
+                <ScalarProperty Name="YearUsed" ColumnName="YearUsed" />
+                <ScalarProperty Name="PurchaseId" ColumnName="PurchaseId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_purchased_items_indate" FunctionName="InventoryDb.Store.sp_purchased_items_indate">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="InventoryDb.sp_purchased_items_indate_Result">
+                <ScalarProperty Name="PurchaseId" ColumnName="PurchaseId" />
+                <ScalarProperty Name="ItemId" ColumnName="ItemId" />
+                <ScalarProperty Name="SubcatId" ColumnName="SubcatId" />
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="RequiresRefrig" ColumnName="RequiresRefrig" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="PricePerBox" ColumnName="PricePerBox" />
+                <ScalarProperty Name="ItemsPerBox" ColumnName="ItemsPerBox" />
+                <ScalarProperty Name="Boxes" ColumnName="Boxes" />
+                <ScalarProperty Name="DatePurchased" ColumnName="DatePurchased" />
+                <ScalarProperty Name="ExpiryDate" ColumnName="ExpiryDate" />
+                <ScalarProperty Name="SupplierId" ColumnName="SupplierId" />
+                <ScalarProperty Name="ItemsRemaining" ColumnName="ItemsRemaining" />
+                <ScalarProperty Name="SupplierName" ColumnName="SupplierName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <EntitySetMapping Name="ProjectDates">
+            <EntityTypeMapping TypeName="InventoryDb.ProjectDate">
+              <MappingFragment StoreEntitySet="ProjectDates">
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserReviews">
+            <EntityTypeMapping TypeName="InventoryDb.UserReview">
+              <MappingFragment StoreEntitySet="UserReviews">
+                <ScalarProperty Name="ReviewId" ColumnName="ReviewId" />
+                <ScalarProperty Name="UpdatedValues" ColumnName="UpdatedValues" />
+                <ScalarProperty Name="DateReviewed" ColumnName="DateReviewed" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

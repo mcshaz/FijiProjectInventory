@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Web
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FijiProjectInventory", "FijiProjectInventory\FijiProjectInventory.csproj", "{BE60DA5F-EA22-435B-9F93-FF080A69B98F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FijiProjectInventory.Tests", "FijiProjectInventory.Tests\FijiProjectInventory.Tests.csproj", "{471F6E09-A7FE-4B2B-926C-951BEDBC115C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE60DA5F-EA22-435B-9F93-FF080A69B98F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE60DA5F-EA22-435B-9F93-FF080A69B98F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE60DA5F-EA22-435B-9F93-FF080A69B98F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE60DA5F-EA22-435B-9F93-FF080A69B98F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{471F6E09-A7FE-4B2B-926C-951BEDBC115C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{471F6E09-A7FE-4B2B-926C-951BEDBC115C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{471F6E09-A7FE-4B2B-926C-951BEDBC115C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{471F6E09-A7FE-4B2B-926C-951BEDBC115C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
