@@ -45,7 +45,7 @@
             }, lookForChange = function () {
                 var j = 0;
                 for (; j < purchaseObservedProps.length; j++) {
-                    subscriptions.push(self[purchaseObservedProps[j]].subscribe(onChange));
+                    subscriptions.push(self[purchaseObservedProps[j]].subscribe(onChange,self));
                 }
             };
         ko.utils.extend(self, koMvcGlobals.mappers.mappedObject(data));
@@ -109,11 +109,6 @@
     // Overall viewmodel for this screen, along with initial state
     function PurchasesViewModel() {
         var self = this, sortAsc = {},
-            unloadfunc = function(){
-                confirmationMessage = 'If you leave before saving, your changes will be lost.';
-                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-            },
             //data must be an object including the name of the arguments on the MVC method
             sendAjax = function (data, url) {
                 var options = {
@@ -136,6 +131,7 @@
                         self.itemNameOptions.push(itemName);
                     }
                 }
+                self.itemNameOptions.sort();
             }, itemNameSubscriptions=[],
             clearPurchaseItems = function () {
                 while (itemNameSubscriptions.length) {
@@ -146,6 +142,14 @@
                 });
                 self.purchaseItems.removeAll();
              };
+
+        $(window).on('beforeunload', function (e) {
+            if (self.anyForUpdate()) {
+                var confirmationMessage = 'If you leave before saving, your changes will be lost.';
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        })
 
         // Editable data
         self.purchaseItems = ko.observableArray([]);
@@ -175,14 +179,6 @@
                 if (arr[i].isChanged() || arr[i]._destroy) { return true; };
             }
             return false;
-        });
-
-        self.anyForUpdate.subscribe(function (newVal) {
-            if (newVal) {
-                $(window).on('beforeunload', unloadfunc);
-            } else {
-                $(window).off('beforeunload', unloadfunc);
-            }
         });
 
         self.categoryOptions = koMvcGlobals.enumerables.categories;
@@ -236,8 +232,8 @@
                     alert("Update failed with: " + errorThrown);
                 });
         };
-        self.category.subscribe(updateList);
-        self.selectedDate.subscribe(updateList)
+        self.category.subscribe(updateList,self);
+        self.selectedDate.subscribe(updateList,self)
 
         self.addProjectDate = ko.observable();
         // Operations
@@ -245,7 +241,7 @@
             var newItem = new PlannedPurchase(self.totalCost);
             self.purchaseItems.unshift(newItem);
             newItem.errors.showAllMessages();
-            itemNameSubscriptions.push(newItem.ItemName.subscribe(itemNameChange))
+            itemNameSubscriptions.push(newItem.ItemName.subscribe(itemNameChange,self))
         };
         self.removeItem = function (item)
         {
@@ -255,6 +251,7 @@
             else {
                 self.purchaseItems.destroy(item);
             }
+            item.dispose();
         };
 
         self.sort = function (prop, el, event) {
@@ -285,28 +282,34 @@
         };
         var propertiesToUpdate = [];
         self.saveChanges = function(){
-            var unmapped = [], awaitingUpdate=[];
+            var unmapped = [], awaitUpdate=[], awaitDelete = [];
 
             ko.utils.arrayForEach(self.purchaseItems(), function (el) {
                 if (el.isChanged()) {
                     unmapped.push(koMvcGlobals.mappers.unmappedObject(el));
-                    awaitingUpdate.push(el);
+                    awaitUpdate.push(el);
+                } else if (el._destroy) {
+                    unmapped.push(koMvcGlobals.mappers.unmappedObject(el));
+                    awaitDelete.push(el);
                 }
             });
             sendAjax({data: unmapped, categoryId: self.category().Key})
                 .done(function( data, textStatus, jqXHR ) {
                     var i=0,p;
-                    console.assert(data.length == awaitingUpdate.length,"array returned from server of unexpected length");
-                    for (;i < awaitingUpdate.length;i++) {
-                        awaitingUpdate[i].notifySaved();
+                    console.assert(data.length == awaitUpdate.length,"array returned from server of unexpected length");
+                    for (;i < awaitUpdate.length;i++) {
+                        awaitUpdate[i].notifySaved();
                         if (!propertiesToUpdate.length) {
                             for(p in data[i]){ 
-                                if (data[i].hasOwnProperty(p) && !ko.isObservable(awaitingUpdate[i][p])) {propertiesToUpdate.push(p);}
+                                if (data[i].hasOwnProperty(p) && !ko.isObservable(awaitUpdate[i][p])) {propertiesToUpdate.push(p);}
                             };
                         }
                         ko.utils.arrayForEach(propertiesToUpdate, function (propName) {
-                            awaitingUpdate[i][propName] = data[i][propName];
+                            awaitUpdate[i][propName] = data[i][propName];
                         });
+                    }
+                    for (i = 0; i < awaitDelete.length; i++) {
+                        self.purchaseItems.remove(awaitDelete[i]);
                     }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 alert("Update failed with: " + errorThrown);

@@ -45,7 +45,7 @@ td.calculatedVal {
 #purchaseTable th.unpadded{
     padding:0;
 }
-td.rowErrorMarker{
+.rowErrorMarker{
     font-weight:bold;
     color:orangered;
 }

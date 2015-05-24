@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Collections.Generic;
 using FijiProjectInventory.Helpers;
 using FijiProjectInventory.Utilities;
+using System.Linq;
 
 namespace FijiProjectInventory.Controllers
 {
@@ -22,7 +23,7 @@ namespace FijiProjectInventory.Controllers
             {
                 PurchaseItemsServices.AddOrUpdateItems(data, categoryId);
                 var returnVar = new JsonNetResult { CustomResolver = new DerivedTypeFilterContractResolver<RequiredItemIds>() };
-                returnVar.Data = data;
+                returnVar.Data = data.Where(r=>!r._destroy);
                 return returnVar;
             }
             return ModelState.JsonValidation();

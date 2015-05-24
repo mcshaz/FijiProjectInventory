@@ -78,64 +78,68 @@ namespace FijiProjectInventory.ServiceLayer
                     {
                         if (d.PurchaseId != 0)
                         {
-                            db.Purchases.Remove(new Purchase { Id = d.PurchaseId });
+                            var p = new Purchase { Id = d.PurchaseId };
+                            db.Purchases.Attach(p);
+                            db.Purchases.Remove(p);
+                            db.SaveChanges();
                         }
-                    }
-                    Item i;
-                    if (d.ItemId == 0)
-                    {
-                        i = db.Items.FirstOrDefault(it => it.Name == d.ItemName);
-                        if (i==null)
+                    } else {
+                        Item i;
+                        if (d.ItemId == 0)
                         {
-                            i = new Item();
-                            db.Items.Add(i);
+                            i = db.Items.FirstOrDefault(it => it.Name == d.ItemName);
+                            if (i == null)
+                            {
+                                i = new Item();
+                                db.Items.Add(i);
+                            }
                         }
-                    }
-                    else
-                    {
-                        i = db.Items.Find(d.ItemId);
-                    }
-                    i.CategoryId = categoryId;
-                    i.Name = d.ItemName;
-                    i.Notes = d.ItemNotes;
-                    i.RequiresRefrig = d.ItemRequiresRefridge;
+                        else
+                        {
+                            i = db.Items.Find(d.ItemId);
+                        }
+                        i.CategoryId = categoryId;
+                        i.Name = d.ItemName;
+                        i.Notes = d.ItemNotes;
+                        i.RequiresRefrig = d.ItemRequiresRefridge;
 
-                    Subcategory s;
-                    if (d.SubcategoryId == 0)
-                    {
-                        s = new Subcategory();
-                        db.Subcategories.Add(s);
-                    }
-                    else
-                    {
-                        s = db.Subcategories.Find(d.SubcategoryId);
-                    }
-                    s.Description = d.SubcategoryDescription ?? string.Empty;
-                    s.ItemId = d.ItemId;
-                    s.Item = i;
+                        Subcategory s;
+                        if (d.SubcategoryId == 0)
+                        {
+                            s = new Subcategory();
+                            db.Subcategories.Add(s);
+                        }
+                        else
+                        {
+                            s = db.Subcategories.Find(d.SubcategoryId);
+                        }
+                        s.Description = d.SubcategoryDescription ?? string.Empty;
+                        s.ItemId = d.ItemId;
+                        s.Item = i;
 
-                    Purchase p;
-                    if (d.PurchaseId == 0)
-                    {
-                        p = new Purchase();
-                        db.Purchases.Add(p);
-                    }
-                    else
-                    {
-                        p = db.Purchases.Find(d.PurchaseId);
-                    }
-                    p.ItemsPerBox = (byte)d.ItemsPerBox;
-                    p.PricePerBox = d.PricePerBox;
-                    p.SubcategoryId = d.SubcategoryId;
-                    p.Subcategory = s;
-                    p.SupplierId = d.SupplierId;
-                    p.Boxes = d.Boxes;
+                        Purchase p;
+                        if (d.PurchaseId == 0)
+                        {
+                            p = new Purchase();
+                            db.Purchases.Add(p);
+                        }
+                        else
+                        {
+                            p = db.Purchases.Find(d.PurchaseId);
+                        }
+                        p.ItemsPerBox = (byte)d.ItemsPerBox;
+                        p.PricePerBox = d.PricePerBox;
+                        p.SubcategoryId = d.SubcategoryId;
+                        p.Subcategory = s;
+                        p.SupplierId = d.SupplierId;
+                        p.Boxes = d.Boxes;
 
-                    db.SaveChanges(); //todo savechangesasync
+                        db.SaveChanges(); //todo savechangesasync
 
-                    d.ItemId = i.Id;
-                    d.SubcategoryId = s.Id;
-                    d.PurchaseId = p.Id;
+                        d.ItemId = i.Id;
+                        d.SubcategoryId = s.Id;
+                        d.PurchaseId = p.Id;
+                    }
                 }
             }
         }

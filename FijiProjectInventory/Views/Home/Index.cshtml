@@ -30,6 +30,9 @@
                 @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemRequiresRefridge)
             </th>
             <th rowspan="2">
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemNotes)
+            </th>
+            <th rowspan="2">
                 @Html.DisplayNameFor(model => model.RequiredItemDefaults.SubcategoryDescription)
             </th>
             <th rowspan="2">
@@ -89,12 +92,20 @@
 </table>
 <script type="text/html" id="itemTemplate">
     <tr class="data-row">
-        <td class="rowErrorMarker" data-bind="style:{visibility: isValid()?'hidden':'visible'}, attr:{title: errors().join('\n')}">*</td>
+        <td>
+            <a href="#"><img data-bind="click:$root.removeItem" src=@Url.Content("~/Content/trash.png") alt="delete" title="delete this row" /></a>
+            <span class="rowErrorMarker" data-bind="style:{visibility: isValid()?'hidden':'visible'}, attr:{title: errors().join('\n')}">
+                *
+            </span>
+        </td>
         <td>
             @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "jqAuto: { value: ItemName, source: $root.itemNameOptions}" } })
         </td>
         <td class="bool">
             @Html.EditorFor(model => model.RequiredItemDefaults.ItemRequiresRefridge, new { htmlAttributes = new { data_bind = "checked:ItemRequiresRefridge" } })
+        </td>
+        <td class="bool">
+            <a href="#"><img src=@Url.Content("~/Content/report--pencil.png") alt="note" data-bind="attr:{title:'Add a note about ' +ItemName()}" /></a>
         </td>
         <td>
             @Html.EditorFor(model => model.RequiredItemDefaults.SubcategoryDescription, new { htmlAttributes = new { data_bind = "value:SubcategoryDescription" } })
