@@ -49,9 +49,9 @@ namespace FijiProjectInventory.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "Email")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "User Name")]
+        //[EmailAddress]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -64,10 +64,22 @@ namespace FijiProjectInventory.Models
 
     public class RegisterViewModel
     {
+        [Required, StringLength(128)]
+        [Display(Name = "First Name")]
+        public string Firstname { get; set; }
+
+        [Required, StringLength(128)]
+        [Display(Name = "Surame")]
+        public string Surname { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
+
+        [StringLength(128)]
+        [Display(Name = "Mobile Phone Number", Description ="Not required, but will help your colleages contact you to discuss planning")]
+        public string PhoneNumber { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]

@@ -15,10 +15,10 @@ namespace FijiProjectInventory
     using System.Data.Entity.Core.Objects;
     using System.Linq;
     
-    public partial class InventoryEntitiesConnect : DbContext
+    public partial class InventoryEntities : DbContext
     {
-        public InventoryEntitiesConnect()
-            : base("name=InventoryEntitiesConnect")
+        public InventoryEntities()
+            : base("name=InventoryEntities")
         {
         }
     
@@ -27,25 +27,28 @@ namespace FijiProjectInventory
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
         public virtual DbSet<Category> Categories { get; set; }
         public virtual DbSet<Item> Items { get; set; }
+        public virtual DbSet<ItemSubcategory> ItemSubcategories { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<ProjectDate> ProjectDates { get; set; }
+        public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Purchase> Purchases { get; set; }
         public virtual DbSet<StoreMovement> StoreMovements { get; set; }
         public virtual DbSet<StoreReturnDisparity> StoreReturnDisparities { get; set; }
-        public virtual DbSet<Subcategory> Subcategories { get; set; }
         public virtual DbSet<Supplier> Suppliers { get; set; }
-        public virtual DbSet<UseByYearVw> UseByYearVws { get; set; }
-        public virtual DbSet<ProjectDate> ProjectDates { get; set; }
         public virtual DbSet<UserReview> UserReviews { get; set; }
+        public virtual DbSet<UsedByProjectDate> UsedByProjectDates { get; set; }
+        public virtual DbSet<PlanningPhase> PlanningPhases { get; set; }
     
-        public virtual ObjectResult<sp_purchased_items_indate_Result> sp_purchased_items_indate(Nullable<System.DateTime> projectdate)
+        public virtual ObjectResult<sp_purchased_items_indate_Result> sp_purchased_items_indate(Nullable<int> projectDateId)
         {
-            var projectdateParameter = projectdate.HasValue ?
-                new ObjectParameter("projectdate", projectdate) :
-                new ObjectParameter("projectdate", typeof(System.DateTime));
+            var projectDateIdParameter = projectDateId.HasValue ?
+                new ObjectParameter("projectDateId", projectDateId) :
+                new ObjectParameter("projectDateId", typeof(int));
     
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_purchased_items_indate_Result>("sp_purchased_items_indate", projectdateParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_purchased_items_indate_Result>("sp_purchased_items_indate", projectDateIdParameter);
         }
     }
 }

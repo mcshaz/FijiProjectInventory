@@ -14,9 +14,14 @@ namespace FijiProjectInventory
     
     public partial class UserReview
     {
-        public string UserName { get; set; }
-        public System.DateTime DateReviewed { get; set; }
-        public bool UpdatedValues { get; set; }
-        public int ReviewId { get; set; }
+        public byte[] SessionId { get; set; }
+        public System.DateTime FirstViewTime { get; set; }
+        public Nullable<System.DateTime> LasthChangeTime { get; set; }
+        public int Updates { get; set; }
+        public int Deletes { get; set; }
+        public int Creates { get; set; }
+        public System.Guid UserId { get; set; }
+    
+        public virtual AspNetUser AspNetUser { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace FijiProjectInventory
         public int PurchaseId { get; set; }
         public int ItemId { get; set; }
         public int SubcatId { get; set; }
-        public byte CategoryId { get; set; }
+        public int CategoryId { get; set; }
         public string Name { get; set; }
         public bool RequiresRefrig { get; set; }
         public string Notes { get; set; }

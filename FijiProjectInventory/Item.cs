@@ -14,18 +14,20 @@ namespace FijiProjectInventory
     
     public partial class Item
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Item()
         {
-            this.Subcategories = new HashSet<Subcategory>();
+            this.ItemSubcategories = new HashSet<ItemSubcategory>();
         }
     
         public int Id { get; set; }
         public string Name { get; set; }
         public bool RequiresRefrig { get; set; }
         public string Notes { get; set; }
-        public byte CategoryId { get; set; }
+        public int CategoryId { get; set; }
     
         public virtual Category Category { get; set; }
-        public virtual ICollection<Subcategory> Subcategories { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ItemSubcategory> ItemSubcategories { get; set; }
     }
 }

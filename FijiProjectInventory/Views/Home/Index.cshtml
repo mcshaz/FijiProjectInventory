@@ -14,7 +14,7 @@
     <select id="dates" data-bind="value: selectedDate, options: dates, optionsText:'formatted',optionsCaption: 'Select Project Date'"></select>
     <div id="dpholder">
         <label for="dp" id="dplabel">project date:</label>
-        <input id="dp" data-bind="datepicker: addProjectDate, datepickerOptions: { minDate: new Date() , dateFormat:'d M yy', showButtonPanel:true }" />
+        <input id="dp" data-bind="datepicker: { minDate: new Date() , dateFormat:'d M yy', showButtonPanel:true }" />
     </div>
 </div>
 <table id="purchaseTable">
@@ -33,7 +33,7 @@
                 @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemNotes)
             </th>
             <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.SubcategoryDescription)
+                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemSubcategoryDescription)
             </th>
             <th rowspan="2">
                 @Html.DisplayNameFor(model => model.RequiredItemDefaults.SupplierName)
@@ -68,21 +68,18 @@
                     @Html.DisplayNameFor(model => model.RequiredItemDefaults.Cost)
                 </a>
             </th>
-            @if (Model.PastYears.Count > 0)
+            @if (Model.PastProjectDates.Count > 0)
             {
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.RemainingItems)
-                </th>
-                <th colspan="@Model.PastYears.Count">Used in Year</th>
+                <th colspan="@Model.PastProjectDates.Count">Used in Year</th>
             }
         </tr>
-        @if (Model.PastYears.Count > 0)
+        @if (Model.PastProjectDates.Count > 0)
         {
         <tr>
             <td colspan="10"></td>
-            @foreach (var i in Model.PastYears)
+            @foreach (var i in Model.PastProjectDates)
             {
-                <td>i</td>
+                <td class="center">@i.ToString("d MMM yyyy")</td>
             }
         </tr>
         }
@@ -99,16 +96,16 @@
             </span>
         </td>
         <td>
-            @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "jqAuto: { value: ItemName, source: $root.itemNameOptions}" } })
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "value:ItemName, autocomplete: { source: $root.itemNameOptions}" } })
         </td>
-        <td class="bool">
+        <td class="center">
             @Html.EditorFor(model => model.RequiredItemDefaults.ItemRequiresRefridge, new { htmlAttributes = new { data_bind = "checked:ItemRequiresRefridge" } })
         </td>
-        <td class="bool">
+        <td class="center">
             <a href="#"><img src=@Url.Content("~/Content/report--pencil.png") alt="note" data-bind="attr:{title:'Add a note about ' +ItemName()}" /></a>
         </td>
         <td>
-            @Html.EditorFor(model => model.RequiredItemDefaults.SubcategoryDescription, new { htmlAttributes = new { data_bind = "value:SubcategoryDescription" } })
+            @Html.EditorFor(model => model.RequiredItemDefaults.ItemSubcategoryDescription, new { htmlAttributes = new { data_bind = "value:ItemSubcategoryDescription" } })
         </td>
         <td>
             @Html.EditorFor(model => model.RequiredItemDefaults.SupplierName, new { htmlAttributes = new { data_bind = "value:SupplierName" } })
@@ -139,7 +136,6 @@
 
 <script type="text/javascript">
     @{ var mappers = Html.ValidationToJs(Model.RequiredItemDefaults); }
-    ; 
     window.koMvcGlobals = {
             urls:{
                 getPurchases : '@Url.Action("GetPurchases")',

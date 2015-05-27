@@ -12,10 +12,10 @@ namespace FijiProjectInventory
     using System;
     using System.Collections.Generic;
     
-    public partial class UseByYearVw
+    public partial class UsedByProjectDate
     {
-        public int PurchaseId { get; set; }
-        public int YearUsed { get; set; }
-        public int TotalUsed { get; set; }
+        public Nullable<int> UsedItemCount { get; set; }
+        public int ItemSubcategoryId { get; set; }
+        public System.DateTime StartDate { get; set; }
     }
 }

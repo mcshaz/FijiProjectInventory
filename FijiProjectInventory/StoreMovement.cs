@@ -14,24 +14,30 @@ namespace FijiProjectInventory
     
     public partial class StoreMovement
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public StoreMovement()
         {
             this.StoreReturnDisparities = new HashSet<StoreReturnDisparity>();
         }
     
-        public int Id { get; set; }
+        public System.Guid Id { get; set; }
         public int PurchaseId { get; set; }
-        public byte WardId { get; set; }
+        public int LocationId { get; set; }
         public short ItemsOut { get; set; }
         public short ItemsReturned { get; set; }
         public System.DateTime TimeOut { get; set; }
         public Nullable<System.DateTime> TimeReturned { get; set; }
         public string Notes { get; set; }
-        public string CheckoutUserId { get; set; }
-        public string CheckinUserId { get; set; }
+        public int ProjectDateId { get; set; }
+        public Nullable<System.Guid> CheckoutUserId { get; set; }
+        public System.Guid CheckinUserId { get; set; }
     
+        public virtual AspNetUser AspNetUser { get; set; }
+        public virtual AspNetUser AspNetUser1 { get; set; }
         public virtual Location Location { get; set; }
+        public virtual ProjectDate ProjectDate { get; set; }
         public virtual Purchase Purchase { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StoreReturnDisparity> StoreReturnDisparities { get; set; }
     }
 }

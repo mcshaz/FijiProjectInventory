@@ -17,11 +17,11 @@ namespace FijiProjectInventory.Controllers
             return View(model);
         }
         [HttpPost, ValidateAntiForgeryToken] //ValidateInput, Authorize
-        public ActionResult Index(List<RequiredItem> data, byte categoryId)
+        public ActionResult Index(List<RequiredItem> data, byte categoryId, byte projectDateId)
         {
             if (ModelState.IsValid)
             {
-                PurchaseItemsServices.AddOrUpdateItems(data, categoryId);
+                PurchaseItemsServices.AddOrUpdateItems(data, categoryId, projectDateId);
                 var returnVar = new JsonNetResult { CustomResolver = new DerivedTypeFilterContractResolver<RequiredItemIds>() };
                 returnVar.Data = data.Where(r=>!r._destroy);
                 return returnVar;
@@ -29,16 +29,21 @@ namespace FijiProjectInventory.Controllers
             return ModelState.JsonValidation();
         }
         [HttpPost, ValidateAntiForgeryToken]
-        public ActionResult GetPurchases(int categoryId, DateTime projectDate)
+        public ActionResult GetPurchases(int categoryId, int projectDateId)
         {
             if (ModelState.IsValid)
             {
-                var model = PurchaseItemsServices.GetRequiredItems(categoryId, projectDate);
+                var model = PurchaseItemsServices.GetRequiredItems(categoryId, projectDateId);
                 var returnVar = new JsonNetResult();
                 returnVar.Data = model;
                 return returnVar;
             }
             return ModelState.JsonValidation();
+        }
+        [HttpGet]
+        public ActionResult PlanningPhases()
+        {
+            return View(PlanningValsService.GetCurrentPhases());
         }
         public ActionResult About()
         {

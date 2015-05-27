@@ -14,6 +14,20 @@ namespace FijiProjectInventory
     
     public partial class ProjectDate
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public ProjectDate()
+        {
+            this.Purchases = new HashSet<Purchase>();
+            this.StoreMovements = new HashSet<StoreMovement>();
+        }
+    
+        public int Id { get; set; }
         public System.DateTime StartDate { get; set; }
+        public string Description { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Purchase> Purchases { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<StoreMovement> StoreMovements { get; set; }
     }
 }

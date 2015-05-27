@@ -15,10 +15,12 @@ namespace FijiProjectInventory
     public partial class StoreReturnDisparity
     {
         public int Id { get; set; }
-        public int StoreMovementId { get; set; }
         public short ItemsReturned { get; set; }
-        public string CheckinUserId { get; set; }
+        public System.DateTime TimeReturned { get; set; }
+        public System.Guid StoreMovementId { get; set; }
+        public System.Guid CheckinUserId { get; set; }
     
+        public virtual AspNetUser AspNetUser { get; set; }
         public virtual StoreMovement StoreMovement { get; set; }
     }
 }

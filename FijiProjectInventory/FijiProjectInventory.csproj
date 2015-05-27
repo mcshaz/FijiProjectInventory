@@ -44,12 +44,20 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Elmah, Version=1.2.14706.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Elmah.Mvc, Version=2.1.2.1389, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Elmah.MVC.2.1.2\lib\net40\Elmah.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -160,10 +168,6 @@
     <Reference Include="System.Web.Optimization">
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
     </Reference>
-    <Reference Include="WebActivator, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebActivator.1.4\lib\NETFramework40\WebActivator.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
@@ -180,12 +184,16 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="AspNetUser.cs">
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Category.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Exceptions\UnexpectedSessionIdChange.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -195,60 +203,68 @@
     <Compile Include="Helpers\PropertyName.cs" />
     <Compile Include="Helpers\ObservableAttribute.cs" />
     <Compile Include="Helpers\ToJSValidationAttributeObject.cs" />
-    <Compile Include="InventoryMSSqlModel.Context.cs">
+    <Compile Include="InventoryEntities.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>InventoryMSSqlModel.Context.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.Context.tt</DependentUpon>
     </Compile>
-    <Compile Include="InventoryMSSqlModel.cs">
+    <Compile Include="InventoryEntities.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="InventoryMSSqlModel.Designer.cs">
+    <Compile Include="InventoryEntities.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>InventoryMSSqlModel.edmx</DependentUpon>
+      <DependentUpon>InventoryEntities.edmx</DependentUpon>
     </Compile>
     <Compile Include="Item.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ItemSubcategory.cs">
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Location.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\PlanningPhaseModel.cs" />
     <Compile Include="Models\RequiredItemsModel.cs" />
+    <Compile Include="PlanningPhase.cs">
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Project.cs">
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
+    </Compile>
     <Compile Include="ProjectDate.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Purchase.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
+    <Compile Include="ServiceLayer\PlanningValsService.cs" />
     <Compile Include="ServiceLayer\PurchaseItemsServices.cs" />
     <Compile Include="sp_purchased_items_indate_Result.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="StoreMovement.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="StoreReturnDisparity.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Subcategory.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Supplier.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
-    <Compile Include="UseByYearVw.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+    <Compile Include="UsedByProjectDate.cs">
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="UserReview.cs">
-      <DependentUpon>InventoryMSSqlModel.tt</DependentUpon>
+      <DependentUpon>InventoryEntities.tt</DependentUpon>
     </Compile>
     <Compile Include="Utilities\CompareExtensions.cs" />
     <Compile Include="Utilities\DerivedTypeFilterContractResolver.cs" />
@@ -355,33 +371,30 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <EntityDeploy Include="InventoryMSSqlModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>InventoryMSSqlModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
     <Content Include="Icon.png" />
-    <Content Include="InventoryMSSqlModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>InventoryMSSqlModel.edmx</DependentUpon>
-      <LastGenOutput>InventoryMSSqlModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="InventoryMSSqlModel.edmx.diagram">
-      <DependentUpon>InventoryMSSqlModel.edmx</DependentUpon>
-    </Content>
-    <Content Include="InventoryMSSqlModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>InventoryMSSqlModel.edmx</DependentUpon>
-      <LastGenOutput>InventoryMSSqlModel.cs</LastGenOutput>
-    </Content>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\DataTables\css\dataTables.responsive.scss" />
-    <Content Include="Content\DataTables\css\dataTables.jqueryui.scss" />
-    <None Include="Scripts\jquery-2.1.3.intellisense.js" />
+    <EntityDeploy Include="InventoryEntities.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>InventoryEntities.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="InventoryEntities.edmx.diagram">
+      <DependentUpon>InventoryEntities.edmx</DependentUpon>
+    </Content>
+    <Content Include="InventoryEntities.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InventoryEntities.edmx</DependentUpon>
+      <LastGenOutput>InventoryEntities.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="InventoryEntities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InventoryEntities.edmx</DependentUpon>
+      <LastGenOutput>InventoryEntities.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\DataTables\dataTables.autoFill.js" />
@@ -408,9 +421,12 @@
     <Content Include="Scripts\DataTables\jquery.dataTables.js" />
     <Content Include="Scripts\DataTables\jquery.dataTables.min.js" />
     <Content Include="Scripts\inventoryPlanner-0.0.1.js" />
-    <Content Include="Scripts\jquery-2.1.3.js" />
-    <Content Include="Scripts\jquery-2.1.3.min.js" />
-    <Content Include="Scripts\jquery-2.1.3.min.map" />
+    <Content Include="Content\DataTables\css\dataTables.responsive.scss" />
+    <Content Include="Content\DataTables\css\dataTables.jqueryui.scss" />
+    <None Include="Scripts\jquery-2.1.4.intellisense.js" />
+    <Content Include="Scripts\jquery-2.1.4.js" />
+    <Content Include="Scripts\jquery-2.1.4.min.js" />
+    <Content Include="Scripts\jquery-2.1.4.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.js" />
     <Content Include="Scripts\jquery-ui-1.11.4.min.js" />
@@ -420,12 +436,14 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\knockout-3.3.0.debug.js" />
     <Content Include="Scripts\knockout-3.3.0.js" />
+    <Content Include="Scripts\knockout-jqueryui.min.js" />
     <Content Include="Scripts\knockout.mapping-latest.debug.js" />
     <Content Include="Scripts\knockout.mapping-latest.js" />
     <Content Include="Scripts\knockout.validation.js" />
     <Content Include="Scripts\knockout.validation.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\npm.js" />
+    <Content Include="Scripts\PlanningPhase-0.0.1.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
@@ -470,7 +488,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Scripts\knockout.validation.min.js.map" />
-    <Content Include="Scripts\knockout-jqAutocomplete-0.4.3.js" />
+    <Content Include="Views\Home\PlanningPhases.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,57 @@
+﻿@model IEnumerable<FijiProjectInventory.Models.PlanningPhaseModel>
+
+@{
+    ViewBag.Title = "View";
+    var emptyItem = FijiProjectInventory.Models.PlanningPhaseModel.GetBWModel();
+}
+@Styles.Render("https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.6.1/spectrum.min.css");
+<h2>View</h2>
+
+<div>
+    <a href="#" data-bind="click:addItem">Create New</a>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TextColour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BackgroundColour)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody data-bind="template: { name: 'itemTemplate', foreach: planningPhases }"></tbody>
+</table>
+    <script type="text/html" id="itemTemplate">
+        <tr class="data-row">
+            <td>
+                <input type="text" data-bind="value: Description, style:{ color: TextColour, backgroundColor: BackgroundColour}" />
+            </td>
+            <td>
+                <input type="color" data-bind="textInput:@Html.PropertyName(modelItem => emptyItem.TextColour)" />
+            </td>
+            <td>
+                <input type="color" data-bind="textInput:@Html.PropertyName(modelItem => emptyItem.BackgroundColour)" />
+            </td>
+        </tr>
+    </script>
+
+<script type="text/javascript">
+    @{ var mappers = Html.ValidationToJs(emptyItem); }
+    window.koMvcGlobals = {
+        initialVals : @Html.AsJson(Model),
+        mappers:{
+            mappedObject : @mappers.KoMappedObject,
+            unmappedObject : @mappers.KoUnmappedObject
+        }
+    };
+</script>
+@Scripts.Render("~/bundles/knockout")
+@Scripts.Render("https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.0/spectrum.min.js")
+@Scripts.Render("~/Scripts/PlanningPhase-0.0.1.js")
+

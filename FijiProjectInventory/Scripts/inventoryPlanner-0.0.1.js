@@ -1,20 +1,54 @@
-﻿; (function () {
+﻿(function () {
     "use strict";
-
+    var D = new Date('2011-06-02T09:34:29+02:00');
+    if (!D || +D !== 1307000069000) {
+        Date.fromISO = function (s) {
+            var day, tz,
+            rx = /^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
+            p = rx.exec(s) || [];
+            if (p[1]) {
+                day = p[1].split(/\D/);
+                for (var i = 0, L = day.length; i < L; i++) {
+                    day[i] = parseInt(day[i], 10) || 0;
+                };
+                day[1] -= 1;
+                day = new Date(Date.UTC.apply(Date, day));
+                if (!day.getDate()) return NaN;
+                if (p[5]) {
+                    tz = (parseInt(p[5], 10) * 60);
+                    if (p[6]) tz += parseInt(p[6], 10);
+                    if (p[4] == '+') tz *= -1;
+                    if (tz) day.setUTCMinutes(day.getUTCMinutes() + tz);
+                }
+                return day;
+            }
+            return NaN;
+        }
+    }
+    else {
+        Date.fromISO = function (s) {
+            return new Date(s);
+        }
+    }
+})();
+(function () {
+    "use strict";
     //take an existing binding handler and make it cause automatic validations
     var makeBindingHandlerValidatable = function (handlerName, validatedPropName) {
         var init = ko.bindingHandlers[handlerName].init;
         ko.bindingHandlers[handlerName].init = function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
             var unwrapped;
             init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
-            if (validatedPropName != undefined) {
+            if (validatedPropName !== undefined) {
                 unwrapped = ko.unwrap(valueAccessor())[validatedPropName];
                 valueAccessor = function () { return unwrapped; };
             }
             return ko.bindingHandlers['validationCore'].init(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
         };
     };
-    makeBindingHandlerValidatable('jqAuto', 'value');
+
+    makeBindingHandlerValidatable("datepicker");
+    makeBindingHandlerValidatable("autocomplete");
 
     //callback function with args value, index, array
     var mapArray = function (array, callback) {
@@ -28,7 +62,7 @@
         insertMessages: false,
         decorateInputElement: true,
         errorsAsTitle: true,
-        errorClass: 'has-error',
+        errorClass: 'text-danger',
         registerExtenders: false,
         messagesOnModified: true,
         parseInputAttributes: false,
@@ -105,7 +139,6 @@
         });
     };
 
-
     // Overall viewmodel for this screen, along with initial state
     function PurchasesViewModel() {
         var self = this, sortAsc = {},
@@ -141,7 +174,8 @@
                     el.dispose();
                 });
                 self.purchaseItems.removeAll();
-             };
+            },
+            deleted = ko.observable(false);
 
         $(window).on('beforeunload', function (e) {
             if (self.anyForUpdate()) {
@@ -175,8 +209,9 @@
 
         self.anyForUpdate = ko.computed(function () {
             var i = 0, arr = self.purchaseItems();
+            if (deleted()) { return true;}
             for (; i < arr.length; i++) {
-                if (arr[i].isChanged() || arr[i]._destroy) { return true; };
+                if (arr[i].isChanged()) { return true; };
             }
             return false;
         });
@@ -185,14 +220,14 @@
         self.category = ko.observable().extend({ required: true });
 
         var dates = mapArray(koMvcGlobals.enumerables.dates, function (el) {
-            var dt = new Date(el);
-            return { date:dt, formatted:$.datepicker.formatDate(dateFormat,dt)};
+            var dt = Date.fromISO(el.Value);
+            return { id:el.Key, date:dt, formatted:$.datepicker.formatDate(dateFormat,dt)};
         }),
             now = new Date(),
             startDate;
         dates.sort(function (a,b) { return a.date < b.date?-1:a.date>b.date?1:0});
         startDate = ko.utils.arrayFirst(dates, function (el) {
-                return el > now;
+                return el.date > now;
             }, self);
         dates.reverse();
         if (!startDate) { startDate = dates[0]; }
@@ -217,7 +252,7 @@
 
         var updateList = function () {
             if (!self.okToCreate()) { return; }
-            sendAjax({ categoryId: self.category().Key, projectDate:self.selectedDate().date.toISOString() }, koMvcGlobals.urls.getPurchases)
+            sendAjax({ categoryId: self.category().Key, projectDateId:self.selectedDate().id }, koMvcGlobals.urls.getPurchases)
                 .done(function (data, textStatus, jqXHR) {
                     var items = mapArray(data, function (el) {
                         return new PlannedPurchase(self.totalCost, el);
@@ -243,6 +278,7 @@
             newItem.errors.showAllMessages();
             itemNameSubscriptions.push(newItem.ItemName.subscribe(itemNameChange,self))
         };
+        
         self.removeItem = function (item)
         {
             if (item.PurchaseId == 0){
@@ -250,12 +286,16 @@
             }
             else {
                 self.purchaseItems.destroy(item);
+                deleted(true);
             }
             item.dispose();
         };
 
         self.sort = function (prop, el, event) {
-            var ascSort = function (a, b) { return a[prop] < b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0 },
+            var ascSort = function (a, b) {
+                var ap = ko.unwrap(a[prop]), bp = ko.unwrap(b[prop]);
+                return ap < bp ? -1 : ap > bp ? 1 : 0
+            },
                 descSort = function (a, b) { return ascSort(b, a); },
                 sortFunc, lastHeaderName='';
                         //if self header was just clicked a second time
@@ -293,7 +333,7 @@
                     awaitDelete.push(el);
                 }
             });
-            sendAjax({data: unmapped, categoryId: self.category().Key})
+            sendAjax({ data: unmapped, categoryId: self.category().Key, projectDateId: self.selectedDate().id })
                 .done(function( data, textStatus, jqXHR ) {
                     var i=0,p;
                     console.assert(data.length == awaitUpdate.length,"array returned from server of unexpected length");
@@ -323,6 +363,4 @@
     }
 
     ko.applyBindings(new PurchasesViewModel());
-    ko.validation.makeBindingHandlerValidatable('datepicker');
-    ko.validation.makeBindingHandlerValidatable('jqAuto');
 })();

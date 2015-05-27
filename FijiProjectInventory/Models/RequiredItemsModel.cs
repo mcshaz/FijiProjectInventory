@@ -15,11 +15,11 @@ namespace FijiProjectInventory.Models
             RequiredItemDefaults = new RequiredItem();
         }
         public IEnumerable<SelectListItem> ItemClassses { get; set; }
-        public IList<int> PastYears { get; set; }
+        public IList<DateTime> PastProjectDates { get; set; }
         public RequiredItem RequiredItemDefaults { get; private set; }
-        public KVEnumerable<byte, string> Suppliers { get; set; }
-        public KVEnumerable<byte, string> Categories { get; set; }
-        public IEnumerable<DateTime> ProjectDates { get; set; }
+        public KVEnumerable<int, string> Suppliers { get; set; }
+        public KVEnumerable<int, string> Categories { get; set; }
+        public KVEnumerable<int,DateTime> ProjectDates { get; set; }
     }
     public class RequiredItemIds
     {
@@ -28,7 +28,7 @@ namespace FijiProjectInventory.Models
         [Observable(KODirective.PropertyOnly)]
         public int PurchaseId { get; set; }
         [Observable(KODirective.PropertyOnly)]
-        public int SubcategoryId { get; set; }
+        public int ItemSubcategoryId { get; set; }
         [Observable(KODirective.PropertyOnly)]
         public byte? SupplierId { get; set; }
     }
@@ -41,7 +41,7 @@ namespace FijiProjectInventory.Models
         [Display(Name = "Notes"), StringLength(1000)]
         public string ItemNotes { get; set; }
         [Display(Name = "Type"), StringLength(50)]
-        public string SubcategoryDescription { get; set; }
+        public string ItemSubcategoryDescription { get; set; }
         [Display(Name = "Price/Box"), DisplayFormat(DataFormatString = "c"), 
             Range(0.01,20000.0,ErrorMessage = "price must be greater than $0.00 and less than $20,000"),
             Required, DataType(DataType.Currency)]
