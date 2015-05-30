@@ -29,13 +29,13 @@ namespace FijiProjectInventory
         public Nullable<System.DateTime> DatePurchased { get; set; }
         public Nullable<System.DateTime> ExpiryDate { get; set; }
         public int PurchaseForProjectDateId { get; set; }
-        public int PlanningPhaseId { get; set; }
+        public Nullable<int> PlanningPhaseId { get; set; }
     
         public virtual ItemSubcategory ItemSubcategory { get; set; }
+        public virtual PlanningPhase PlanningPhase { get; set; }
         public virtual ProjectDate ProjectDate { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<StoreMovement> StoreMovements { get; set; }
         public virtual Supplier Supplier { get; set; }
-        public virtual PlanningPhase PlanningPhas { get; set; }
     }
 }

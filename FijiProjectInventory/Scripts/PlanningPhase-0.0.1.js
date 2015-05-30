@@ -3,6 +3,7 @@
     var PlanningPhase = function (data) {
         var self = this;
         ko.utils.extend(self, koMvcGlobals.mappers.mappedObject(data));
+
     };
 
     var ViewModel = function () {
@@ -11,6 +12,9 @@
             return new PlanningPhase(el);
         }));
         self.addItem = function () {
+            self.planningPhases.unshift(new PlanningPhase());
+        };
+        self.removeItem = function (item) {
             self.planningPhases.unshift(new PlanningPhase());
         };
     };

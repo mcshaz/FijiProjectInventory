@@ -101,12 +101,14 @@ namespace FijiProjectInventory.ServiceLayer
             Debug.Assert(data != null && data.Any(), "Assertion that add or update item contains at least 1 entry failed");
             using (InventoryEntities db = new InventoryEntities())
             {
-                var rv = db.UserReviews.AsNoTracking().FirstOrDefault(ur=>ur.SessionId == GetSessionId()); //no tracking so it does not update on every call to save
+                byte[] sessionId = GetSessionId();
+                var rv = db.UserReviews.AsNoTracking().FirstOrDefault(ur=>ur.SessionId == sessionId); //no tracking so it does not update on every call to save
+                Guid userId = GetUserId();
                 if (rv == null)
                 {
                     Elmah.ErrorSignal.FromCurrentContext().Raise(new UnexpectedSessionIdChange("beginning CRUD operation, sessionID has changed from last data view"));
                     rv = (from ur in db.UserReviews
-                          where ur.UserId == GetUserId()
+                          where ur.UserId == userId
                           orderby ur.FirstViewTime descending
                           select ur).First();
                 }

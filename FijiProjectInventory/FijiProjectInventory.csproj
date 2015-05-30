@@ -271,6 +271,7 @@
     <Compile Include="Utilities\KVExtensions.cs" />
     <Compile Include="Utilities\LinqExtensions.cs" />
     <Compile Include="Utilities\ModelStateExtensions.cs" />
+    <Compile Include="Utilities\StringBuilderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />

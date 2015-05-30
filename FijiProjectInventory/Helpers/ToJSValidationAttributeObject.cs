@@ -16,6 +16,7 @@ namespace FijiProjectInventory.Helpers
     {
         public IHtmlString KoMappedObject { get; internal set; }
         public IHtmlString KoUnmappedObject { get; internal set; }
+        public IHtmlString IdProperties { get; internal set; }
     }
     public static class ToJSValidationAttributeObject
     {
@@ -175,15 +176,16 @@ namespace FijiProjectInventory.Helpers
                 prop.Name = p.Name;
                 if (isEnumerable)
                 {
-                    prop.DefaultValue = KOPropertyMap.JSArray;
+                    prop.DefaultValue = KOPropertyMap.JSArray; //TODO map array
                 }
                 else
                 {
+                    prop.IsKey = atts.ValueOrDefault<KeyAttribute>() != null;
                     DisplayFormatAttribute df = atts.ValueOrDefault<DisplayFormatAttribute>();
                     object o = p.GetValue(defaultNew);
                     if (o == null)
                     {
-                        prop.DefaultValue = '\'' + ((df != null && df.NullDisplayText != null) ? df.NullDisplayText : string.Empty) + '\'';
+                        prop.DefaultValue = "null";
                     }
                     else if (df == null || !df.ApplyFormatInEditMode)
                     {
@@ -213,17 +215,25 @@ namespace FijiProjectInventory.Helpers
             StringBuilder sb = new StringBuilder();
 
             sb.Append("function KoMappedObject(data) { data = data || { }; return {");
-            sb.Append(string.Join(",", properties.Where(p=>(p.InfoFlow & InformationFlow.ToClient)!=0).Select(p=>p.ToMapString())));
+            sb.AppendJoin(",", properties.Where(p=>(p.InfoFlow & InformationFlow.ToClient)!=0).Select(p=>p.ToMapString()));
             sb.Append("}}");
 
             var returnVar = new TwoWayMapping { KoMappedObject = htmlHelper.Raw(sb) };
             sb.Clear();
 
             sb.Append("function KoUnmappedObject(data) { return {");
-            sb.Append(string.Join(",", properties.Where(p=>(p.InfoFlow & InformationFlow.FromClient)!=0).Select(p=>p.ToReverseMapString())));
+            sb.AppendJoin(",", properties.Where(p=>(p.InfoFlow & InformationFlow.FromClient)!=0).Select(p=>p.ToReverseMapString()));
             sb.Append("}}");
 
             returnVar.KoUnmappedObject = htmlHelper.Raw(sb);
+            sb.Clear();
+
+            sb.Append("['");
+            sb.AppendJoin("','", properties.Where(p=>p.IsKey).Select(p=>p.Name));
+            sb.Append("']");
+
+            returnVar.IdProperties = htmlHelper.Raw(sb);
+
             return returnVar;
         }
         static bool IsISOFormat(string format)
@@ -245,6 +255,7 @@ namespace FijiProjectInventory.Helpers
         protected const string fmt = "((typeof data.{0} == 'undefined')?{1}:data.{0})";
         public string Name { get; set; }
         public InformationFlow InfoFlow { get; set; }
+        public bool IsKey { get; set; }
         public virtual string DefaultValue { get; set; }
         public virtual string ToReverseMapString()
         {

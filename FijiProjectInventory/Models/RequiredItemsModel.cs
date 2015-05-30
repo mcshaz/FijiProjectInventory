@@ -23,11 +23,11 @@ namespace FijiProjectInventory.Models
     }
     public class RequiredItemIds
     {
-        [Observable(KODirective.PropertyOnly)]
+        [Observable(KODirective.PropertyOnly),Key]
         public int ItemId { get; set; }
-        [Observable(KODirective.PropertyOnly)]
+        [Observable(KODirective.PropertyOnly),Key]
         public int PurchaseId { get; set; }
-        [Observable(KODirective.PropertyOnly)]
+        [Observable(KODirective.PropertyOnly),Key]
         public int ItemSubcategoryId { get; set; }
         [Observable(KODirective.PropertyOnly)]
         public byte? SupplierId { get; set; }

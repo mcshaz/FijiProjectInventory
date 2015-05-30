@@ -85,7 +85,7 @@
         }
 
     </thead>
-    <tbody data-bind="template: { name: 'itemTemplate', foreach: purchaseItems }"></tbody>
+    <tbody data-bind="template: { name: 'itemTemplate', foreach: datagridItems }"></tbody>
 </table>
 <script type="text/html" id="itemTemplate">
     <tr class="data-row">
@@ -95,7 +95,7 @@
                 *
             </span>
         </td>
-        <td>
+        <td data-bind="fadeVisible: isRepeatItem">
             @Html.EditorFor(model => model.RequiredItemDefaults.ItemName, new { htmlAttributes = new { data_bind = "value:ItemName, autocomplete: { source: $root.itemNameOptions}" } })
         </td>
         <td class="center">
@@ -147,9 +147,10 @@
                 dates: @Html.AsJson(Model.ProjectDates)
             },
         mappers:{
-            mappedObject : @mappers.KoMappedObject,
-            unmappedObject : @mappers.KoUnmappedObject
-        }
+                mappedObject : @mappers.KoMappedObject,
+                unmappedObject : @mappers.KoUnmappedObject
+            },
+        idNames:@mappers.IdProperties
     };
 </script>
 

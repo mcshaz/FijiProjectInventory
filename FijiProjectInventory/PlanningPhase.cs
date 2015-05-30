@@ -21,8 +21,8 @@ namespace FijiProjectInventory
         }
     
         public int Id { get; set; }
-        public string Description { get; set; }
         public int BackgroundColour { get; set; }
+        public string Description { get; set; }
         public int TextColour { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

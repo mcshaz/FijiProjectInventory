@@ -32,6 +32,7 @@ namespace FijiProjectInventory
         public virtual DbSet<Item> Items { get; set; }
         public virtual DbSet<ItemSubcategory> ItemSubcategories { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<PlanningPhase> PlanningPhases { get; set; }
         public virtual DbSet<ProjectDate> ProjectDates { get; set; }
         public virtual DbSet<Project> Projects { get; set; }
         public virtual DbSet<Purchase> Purchases { get; set; }
@@ -40,7 +41,6 @@ namespace FijiProjectInventory
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<UserReview> UserReviews { get; set; }
         public virtual DbSet<UsedByProjectDate> UsedByProjectDates { get; set; }
-        public virtual DbSet<PlanningPhase> PlanningPhases { get; set; }
     
         public virtual ObjectResult<sp_purchased_items_indate_Result> sp_purchased_items_indate(Nullable<int> projectDateId)
         {
