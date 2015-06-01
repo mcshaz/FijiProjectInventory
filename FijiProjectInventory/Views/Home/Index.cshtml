@@ -7,86 +7,93 @@
 <h2>Required Items</h2>
 @Html.AntiForgeryToken()
 <h4>Total Cost: <span data-bind='currency: totalCost'></span></h4>
-<div>
-    <a href="#" data-bind="enableClick:okToCreate, click:addItem">Create New</a>
-    <input type="button" id="submitBtn" data-bind="click:saveChanges, enable:okToSave" value="Save Changes" />
-    <select id="categories" data-bind="value: category, options: categoryOptions, optionsText: 'Value', optionsCaption: 'Select Category', disable:anyForUpdate" ></select>
-    <select id="dates" data-bind="value: selectedDate, options: dates, optionsText:'formatted',optionsCaption: 'Select Project Date'"></select>
-    <div id="dpholder">
-        <label for="dp" id="dplabel">project date:</label>
-        <input id="dp" data-bind="datepicker: { minDate: new Date() , dateFormat:'d M yy', showButtonPanel:true }" />
+<form action="">
+    <div>
+        <a href="#" data-bind="enableClick:okToCreate, click:addItem">Create New</a>
+        <input type="submit" id="submitBtn" data-bind="click:saveChanges, enable:okToSave, css:{'btn-danger':!(allItemsValid() && datagridItems.isValid())}" value="Save Changes" />
+        <select id="categories" data-bind="value: category, options: categoryOptions, optionsText: 'Value', optionsCaption: 'Select Category', disable:anyForUpdate"></select>
+        <select id="dates" data-bind="value: selectedDate, options: dates, optionsText:'formatted',optionsCaption: 'Select Project Date'"></select>
+        <div id="dpholder">
+            <label for="dp" id="dplabel">project date:</label>
+            <input id="dp" data-bind="datepicker: { minDate: new Date() , dateFormat:'d M yy', showButtonPanel:true }" />
+        </div>
+        <div>
+            <ul data-bind="foreach: errors">
+                <li data-bind="text:$data" class="list-group-item-danger"></li>
+            </ul>
+        </div>
     </div>
-</div>
-<table id="purchaseTable">
-    <thead>
-        <tr class="head-centre">
-            <td></td>
-            <th rowspan="2" >
-                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemName)')">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemName)
-                </a>
-            </th>
-            <th rowspan="2" class="unpadded">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemRequiresRefridge)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemNotes)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemSubcategoryDescription)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.SupplierName)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.PricePerBox)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPerBox)
-            </th>
-            <th rowspan="2">
-                @Html.DisplayNameFor(model => model.RequiredItemDefaults.Boxes)
-            </th>
+    <table id="purchaseTable">
+        <thead>
+            <tr class="head-centre">
+                <td></td>
+                <th rowspan="2">
+                    <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemName)')">
+                        @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemName)
+                    </a>
+                </th>
+                <th rowspan="2" class="unpadded">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemRequiresRefridge)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemNotes)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemSubcategoryDescription)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.SupplierName)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.PricePerBox)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPerBox)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.Boxes)
+                </th>
 
-            <th rowspan="2"  >
-                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.RemainingItems)')">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.RemainingItems)
-                </a>
-            </th>
-            <th rowspan="2"  >
-                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.PerItemCost)')">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.PerItemCost)
-                </a>
-            </th>
-            <th rowspan="2"  >
-                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemsPurchased)')">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPurchased)
-                </a>
-            </th>
-            <th rowspan="2"  >
-                <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.Cost)')">
-                    @Html.DisplayNameFor(model => model.RequiredItemDefaults.Cost)
-                </a>
-            </th>
+                <th rowspan="2">
+                    <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.RemainingItems)')">
+                        @Html.DisplayNameFor(model => model.RequiredItemDefaults.RemainingItems)
+                    </a>
+                </th>
+                <th rowspan="2">
+                    <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.PerItemCost)')">
+                        @Html.DisplayNameFor(model => model.RequiredItemDefaults.PerItemCost)
+                    </a>
+                </th>
+                <th rowspan="2">
+                    <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.ItemsPurchased)')">
+                        @Html.DisplayNameFor(model => model.RequiredItemDefaults.ItemsPurchased)
+                    </a>
+                </th>
+                <th rowspan="2">
+                    <a href="#" data-bind="click:sort('@Html.PropertyName(model => model.RequiredItemDefaults.Cost)')">
+                        @Html.DisplayNameFor(model => model.RequiredItemDefaults.Cost)
+                    </a>
+                </th>
+                @if (Model.PastProjectDates.Count > 0)
+            {
+                    <th colspan="@Model.PastProjectDates.Count">Used in Year</th>
+                }
+            </tr>
             @if (Model.PastProjectDates.Count > 0)
             {
-                <th colspan="@Model.PastProjectDates.Count">Used in Year</th>
+                <tr>
+                    <td colspan="10"></td>
+                    @foreach (var i in Model.PastProjectDates)
+                    {
+                        <td class="center">@i.ToString("d MMM yyyy")</td>
+                    }
+                </tr>
             }
-        </tr>
-        @if (Model.PastProjectDates.Count > 0)
-        {
-        <tr>
-            <td colspan="10"></td>
-            @foreach (var i in Model.PastProjectDates)
-            {
-                <td class="center">@i.ToString("d MMM yyyy")</td>
-            }
-        </tr>
-        }
 
-    </thead>
-    <tbody data-bind="template: { name: 'itemTemplate', foreach: datagridItems }"></tbody>
-</table>
+        </thead>
+        <tbody data-bind="template: { name: 'itemTemplate', foreach: datagridItems }"></tbody>
+    </table>
+</form>
 <script type="text/html" id="itemTemplate">
     <tr class="data-row">
         <td>

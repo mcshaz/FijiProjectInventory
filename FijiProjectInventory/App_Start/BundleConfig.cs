@@ -21,6 +21,7 @@ namespace FijiProjectInventory
                         "~/Scripts/knockout-{version}.js",
                         "~/Scripts/knockout.validation.js",
                         "~/Scripts/CustomKnockoutBindings.js",
+                        "~/Scripts/CustomKnockoutValidations.js",
                         "~/Scripts/knockout-jqueryui.min.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're

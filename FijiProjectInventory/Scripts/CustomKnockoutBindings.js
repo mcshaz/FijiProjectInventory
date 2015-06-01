@@ -206,7 +206,7 @@
         self.addToBottomOfGrid = objArgs.addToBottomOfGrid;
         self.datagridItems = ko.observableArray(ko.utils.arrayMap(objArgs.initialUnmappedObjects || [], self.initialiseItemFn));
 
-        self.allValid = ko.pureComputed(function () {
+        self.allItemsValid = ko.pureComputed(function () {
             var i = 0, arr = self.datagridItems();
             for (; i < arr.length; i++) {
                 if (!arr[i].isValid()) { return false; }

@@ -50,7 +50,7 @@ td.calculatedVal {
     color:orangered;
 }
 input:focus {border: 1px solid #5579A9;box-shadow: 0px 0px 4px 0px #6FA5ED;}
-input.text-danger, select.text-danger, textarea.text-danger {border: 3px groove #a94442;; }
+/*input.text-danger, select.text-danger, textarea.text-danger {border: 3px groove #a94442; }*/
 
 #dpholder{
     display:inline-block;

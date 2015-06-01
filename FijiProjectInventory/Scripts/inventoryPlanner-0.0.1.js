@@ -24,7 +24,7 @@
         insertMessages: false,
         decorateInputElement: true,
         errorsAsTitle: true,
-        errorClass: 'text-danger',
+        errorClass: 'text-danger bg-danger',
         registerExtenders: false,
         messagesOnModified: true,
         parseInputAttributes: false,
@@ -96,6 +96,13 @@
                 //self.itemNameOptions.sort();//!TODO use correct already sorted column
                 return true;
             });
+        self.datagridItems.extend({
+            uniqueConstraint:
+                {
+                    params: ["ItemName", "ItemSubcategoryDescription"],
+                    message: "2 or more rows have the same value for both 'Item' and 'Type'"
+                }
+        });
         self.itemNameOptions = [];
         $(window).on('beforeunload', function (e) {
             if (self.anyForUpdate()) {
@@ -133,18 +140,16 @@
         self.selectedDate = ko.observable(startDate).extend({required:true});
 
         self.errors = ko.validation.group(self);
-        self.IsValid = ko.computed(function () {
-            self.allValid() && (self.errors().length === 0);
-        });
-        self.errors.showAllMessages();
 
         self.okToSave = ko.computed(function () {
-            return self.category.isValid() && self.anyForUpdate() && self.allValid();
+            return self.allItemsValid() && (self.errors().length === 0) && self.anyForUpdate();
         });
 
         self.okToCreate = ko.computed(function () {
             return !self.errors().length;
         });
+
+        self.errors.showAllMessages();
 
         var updateList = function () {
             if (!self.okToCreate()) { return; }
@@ -212,7 +217,7 @@
 
         
         $("form").validate({
-            submitHandler: self.save
+            submitHandler: self.saveChanges
         });
     }
     PurchasesViewModel.prototype = Object.create(ko.Datagrid.prototype);
